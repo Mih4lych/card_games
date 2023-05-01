@@ -5,7 +5,7 @@ import enumeratum.{Enum, EnumEntry}
 trait GameState extends EnumEntry
 
 object GameState extends Enum[GameState] {
-  val values = findValues
+  val values: IndexedSeq[GameState] = findValues
 
   case object WaitingPayers extends GameState
 

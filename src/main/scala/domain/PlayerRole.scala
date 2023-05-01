@@ -5,11 +5,11 @@ import enumeratum.{Enum, EnumEntry}
 sealed abstract class PlayerRole(val color: TeamColor) extends EnumEntry
 
 object PlayerRole extends Enum[GameState] {
-  val values = findValues
+  val values: IndexedSeq[GameState] = findValues
 
-  case object SpymasterRed extends PlayerRole(TeamColor.Red)
+  case object RedSpymaster extends PlayerRole(TeamColor.Red)
 
-  case object SpymasterBlue extends PlayerRole(TeamColor.Blue)
+  case object BlueSpymaster extends PlayerRole(TeamColor.Blue)
 
   case object TeamRed extends PlayerRole(TeamColor.Red)
 

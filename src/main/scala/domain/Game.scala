@@ -1,13 +1,10 @@
 package domain
 
-import java.util.UUID
-
-UUID.randomUUID()
-
-case class Game(id: UUID
-               , cards: Map[UUID, Card] //переделать в seq
-               , teamRed: Map[UUID, Player]
-               , teamBlue: Map[UUID, Player]
-               , spectators: Map[UUID, Player]
+import cats.effect._
+case class Game(id: GameId
                , gameCreator: Player
-               , gameState: GameState)
+               , cards: Seq[Card]
+               , teamRed: Seq[Player]
+               , teamBlue: Seq[Player]
+               , spectators: Seq[Player]
+               , moveOrder: MoveOrder = MoveOrder.RedSpymasterMove)

@@ -5,7 +5,7 @@ import enumeratum._
 sealed trait TeamColor extends EnumEntry
 
 object TeamColor extends Enum[TeamColor] {
-  val values = findValues
+  val values: IndexedSeq[TeamColor] = findValues
 
   case object Blue extends TeamColor
 
