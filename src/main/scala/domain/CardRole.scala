@@ -2,7 +2,7 @@ package domain
 
 import enumeratum.{Enum, EnumEntry}
 
-sealed case class CardRole(color: TeamColor) extends EnumEntry
+sealed abstract class CardRole(color: TeamColor) extends EnumEntry
 
 object CardRole extends Enum[CardRole] {
   val values: IndexedSeq[CardRole] = findValues

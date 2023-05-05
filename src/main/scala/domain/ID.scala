@@ -2,26 +2,30 @@ package domain
 
 import cats.effect.kernel.Sync
 import cats.implicits._
+import enumeratum.{Enum, EnumEntry}
 
 import java.util.UUID
-import scala.reflect.runtime.universe._
 
-sealed trait ID
+sealed trait ID extends EnumEntry
 
-final case class CardId(id: String) extends AnyVal with ID
-final case class GameId(id: String) extends AnyVal with ID
-final case class PlayerId(id: String) extends AnyVal with ID
+object ID extends Enum[ID] {
+  override def values: IndexedSeq[ID] = findValues
 
-object ID {
-  def apply[F[-_]: Sync, A <: ID : TypeTag]: F[A] = {
-    Sync[F]
-      .delay(UUID.randomUUID().toString)
-      .map { id =>
-        typeOf[A] match {
-          case _: CardId => CardId(id)
-          case _: GameId => GameId(id)
-          case _: PlayerId => PlayerId(id)
-        }
-      }
+  case class CardId(id: String) extends ID
+  object CardId {
+    def apply[F[_]: Sync](): F[CardId] = nextId.map(CardId(_))
   }
+
+  case class GameId(id: String) extends ID
+  object GameId {
+    def apply[F[_]: Sync](): F[GameId] = nextId.map(GameId(_))
+  }
+
+  case class PlayerId(id: String) extends ID
+  object PlayerId {
+    def apply[F[_]: Sync](): F[PlayerId] = nextId.map(PlayerId(_))
+  }
+
+  def nextId[F[_]: Sync]: F[String] =
+    Sync[F].delay(UUID.randomUUID().toString)
 }

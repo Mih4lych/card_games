@@ -2,7 +2,7 @@ package domain
 
 import enumeratum.{Enum, EnumEntry}
 
-trait GameState extends EnumEntry
+sealed trait GameState extends EnumEntry
 
 object GameState extends Enum[GameState] {
   val values: IndexedSeq[GameState] = findValues

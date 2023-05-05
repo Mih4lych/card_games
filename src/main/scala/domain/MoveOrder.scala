@@ -7,8 +7,8 @@ sealed trait MoveOrder extends EnumEntry
 object MoveOrder extends Enum[MoveOrder] {
   val values: IndexedSeq[MoveOrder] = findValues
 
-  object RedSpymasterMove extends MoveOrder
-  object BlueSpymasterMove extends MoveOrder
-  object RedTeamMove extends MoveOrder
-  object BlueTeamMove extends MoveOrder
+  case object RedSpymasterMove extends MoveOrder
+  case object BlueSpymasterMove extends MoveOrder
+  case object RedTeamMove extends MoveOrder
+  case object BlueTeamMove extends MoveOrder
 }

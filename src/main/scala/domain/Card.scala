@@ -2,6 +2,7 @@ package domain
 
 import cats.effect.kernel.Sync
 import cats.implicits._
+import domain.ID.CardId
 
 case class Card (id: CardId
                 , word: String
@@ -10,7 +11,6 @@ case class Card (id: CardId
 
 object Card {
   def create[F[_]: Sync](word: String, cardRole: CardRole): F[Card] = {
-    ID[F, CardId]
-      .map(cardId => Card(cardId, word, cardRole))
+    CardId().map(cardId => Card(cardId, word, cardRole))
   }
 }
