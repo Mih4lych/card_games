@@ -4,6 +4,10 @@ import enumeratum.{Enum, EnumEntry}
 
 sealed abstract class CardRole(color: TeamColor) extends EnumEntry
 
+//trait without color
+//Innocent and Assassin
+//case class with color parameter for red and blue
+
 object CardRole extends Enum[CardRole] {
   val values: IndexedSeq[CardRole] = findValues
 
