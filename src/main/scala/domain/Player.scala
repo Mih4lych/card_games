@@ -8,10 +8,8 @@ final case class Player(id: PlayerId, name: String, gameId: GameId, role: Player
 }
 
 object Player {
-  implicit val playerEncoder: Encoder[Player] =
-    Encoder.forProduct4("id", "name", "gameId", "role")(s => (s.id, s.name, s.gameId, s.role))
-  implicit val playerDecoder: Decoder[Player] =
-    Decoder.forProduct4("id", "name", "gameId", "role")(Player.apply)
+  implicit val playerEncoder: Encoder[Player] = deriveEncoder[Player]
+  implicit val playerDecoder: Decoder[Player] = deriveDecoder[Player]
 
   def apply(name: String, gameId: GameId): Player = {
     Player(PlayerId(), name, gameId)

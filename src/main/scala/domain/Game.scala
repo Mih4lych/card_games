@@ -40,12 +40,8 @@ object Game {
     implicit val gameWordsCountDecoder: Decoder[GameWordsCount] = Decoder[Int].map(GameWordsCount(_))
   }
 
-  implicit val gameEncoder: Encoder[Game] =
-    Encoder
-      .forProduct10("id", "gameCreator", "gameState", "cards", "wordsCount", "blueTeam", "redTeam", "blueScore", "redScore", "moveOrder")(s => (s.id, s.gameCreator, s.gameState, s.cards, s.wordsCount, s.blueTeam, s.redTeam, s.blueScore, s.redScore, s.moveOrder))
-  implicit val gameDecoder: Decoder[Game] =
-    Decoder
-      .forProduct10("id", "gameCreator", "gameState", "cards", "wordsCount", "blueTeam", "redTeam", "blueScore", "redScore", "moveOrder")(Game.apply)
+  implicit val gameEncoder: Encoder[Game] = deriveEncoder[Game]
+  implicit val gameDecoder: Decoder[Game] = deriveDecoder[Game]
 
   def apply(creator: Player): Game = {
     Game(id = GameId(), gameCreator = creator)

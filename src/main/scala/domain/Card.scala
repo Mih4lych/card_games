@@ -12,10 +12,8 @@ case class Card (id: CardId
 }
 
 object Card {
-  implicit val cardEncoder: Encoder[Card] =
-    Encoder.forProduct4("id", "word", "cardRole", "cardState")(s => (s.id, s.word, s.cardRole, s.cardState))
-  implicit val cardDecoder: Decoder[Card] =
-    Decoder.forProduct4("id", "word", "cardRole", "cardState")(Card.apply)
+  implicit val cardEncoder: Encoder[Card] = deriveEncoder[Card]
+  implicit val cardDecoder: Decoder[Card] = deriveDecoder[Card]
 
   def apply(word: String, cardRole: CardRole): Card = {
     Card(CardId(), word, cardRole)
