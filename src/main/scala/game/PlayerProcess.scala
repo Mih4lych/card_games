@@ -1,6 +1,6 @@
 package game
 
-import domain.{GameError, Player, PlayerRole}
+import domain.{Player, PlayerRole}
 
 trait PlayerProcess {
   def changeRole(player: Player, playerRole: PlayerRole): Player

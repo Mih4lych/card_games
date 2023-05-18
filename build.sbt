@@ -13,6 +13,7 @@ val catsEffectVersion = "3.4.8"
 val doobieVersion = "1.0.0-RC1"
 val newTypeVersion = "0.4.4"
 val http4sVersion = "0.23.18"
+val scalaTestVersion = "3.2.9"
 
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % enumeratumVersion
@@ -39,5 +40,7 @@ libraryDependencies ++= Seq(
   "org.http4s" %% "http4s-ember-server" % http4sVersion,
   "org.http4s" %% "http4s-dsl"          % http4sVersion,
 )
+
+libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion % Test
 
 addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)

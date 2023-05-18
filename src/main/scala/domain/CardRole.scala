@@ -1,21 +1,33 @@
 package domain
 
 import enumeratum.{Enum, EnumEntry}
+import io.circe._
+import io.circe.syntax._
 
-sealed abstract class CardRole(color: TeamColor) extends EnumEntry
-
-//trait without color
-//Innocent and Assassin
-//case class with color parameter for red and blue
+sealed trait CardRole extends EnumEntry
 
 object CardRole extends Enum[CardRole] {
   val values: IndexedSeq[CardRole] = findValues
 
-  case object BlueAgent extends CardRole(TeamColor.Blue)
+  implicit val cardRoleEncode: Encoder[CardRole] = Encoder.instance {
+    case _@ Agent(TeamColor.Red) => "redAgent".asJson
+    case _@ Agent(TeamColor.Blue) => "blueAgent".asJson
+    case Innocent => "innocent".asJson
+    case Assassin => "assassin".asJson
+  }
 
-  case object RedAgent extends CardRole(TeamColor.Red)
+  implicit val cardRoleDecode: Decoder[CardRole] =
+    Decoder
+      .decodeString
+      .emap {
+        case "redAgent" => Right(Agent(TeamColor.Red))
+        case "blueAgent" => Right(Agent(TeamColor.Blue))
+        case "innocent" => Right(Innocent)
+        case "assassin" => Right(Assassin)
+        case _ => Left("Wrong card state")
+      }
 
-  case object Innocent extends CardRole(TeamColor.Gray)
-
-  case object Assassin extends CardRole(TeamColor.Black)
+  case class Agent(teamColor: TeamColor) extends CardRole
+  case object Innocent extends CardRole
+  case object Assassin extends CardRole
 }

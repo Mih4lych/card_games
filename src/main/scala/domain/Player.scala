@@ -1,12 +1,19 @@
 package domain
 
-import cats.effect.kernel.Sync
-import cats.implicits._
-
-final case class Player(id: ID, name: String, role: PlayerRole = PlayerRole.Spectator)
+import domain.ID._
+import io.circe._
+import io.circe.generic.semiauto._
+final case class Player(id: PlayerId, name: String, gameId: GameId, role: PlayerRole = PlayerRole.Operative) {
+  def changeRole(playerRole: PlayerRole): Player = copy(role = playerRole)
+}
 
 object Player {
-  def create[F[_] : Sync](name: String): F[Player] = {
-    ID().map(playerId => Player(playerId, name))
+  implicit val playerEncoder: Encoder[Player] =
+    Encoder.forProduct4("id", "name", "gameId", "role")(s => (s.id, s.name, s.gameId, s.role))
+  implicit val playerDecoder: Decoder[Player] =
+    Decoder.forProduct4("id", "name", "gameId", "role")(Player.apply)
+
+  def apply(name: String, gameId: GameId): Player = {
+    Player(PlayerId(), name, gameId)
   }
 }

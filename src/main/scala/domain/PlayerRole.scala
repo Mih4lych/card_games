@@ -1,19 +1,27 @@
 package domain
 
 import enumeratum.{Enum, EnumEntry}
+import io.circe._
 
-sealed abstract class PlayerRole(val color: TeamColor) extends EnumEntry
+sealed trait PlayerRole extends EnumEntry
 
-object PlayerRole extends Enum[GameState] {
-  val values: IndexedSeq[GameState] = findValues
+object PlayerRole extends Enum[PlayerRole] {
+  val values: IndexedSeq[PlayerRole] = findValues
 
-  case object RedSpymaster extends PlayerRole(TeamColor.Red)
+  implicit val playerRoleEncode: Encoder[PlayerRole] = Encoder[String].contramap {
+    case Spymaster => "spymaster"
+    case Operative => "operative"
+  }
 
-  case object BlueSpymaster extends PlayerRole(TeamColor.Blue)
+  implicit val playerRoleDecode: Decoder[PlayerRole] =
+    Decoder
+      .decodeString
+      .emap {
+        case "spymaster" => Right(Spymaster)
+        case "operative" => Right(Operative)
+      }
 
-  case object TeamRed extends PlayerRole(TeamColor.Red)
+  case object Spymaster extends PlayerRole
 
-  case object TeamBlue extends PlayerRole(TeamColor.Blue)
-
-  case object Spectator extends PlayerRole(TeamColor.Empty)
+  case object Operative extends PlayerRole
 }

@@ -3,30 +3,51 @@ package domain
 import cats.effect.Sync
 import cats.syntax.all._
 import domain.Game._
+import domain.ID._
+import io.circe._
+import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
+import io.circe.syntax._
 
-final case class Game(id: ID
+
+//round (game, card(opened or all), move)
+final case class Game(id: GameId
                      , gameCreator: Player
-                     , players: Seq[Player]
+                     , gameState: GameState = GameState.WaitingPayers
                      , cards: Seq[Card] = Vector.empty[Card]
                      , wordsCount: GameWordsCount = GameWordsCount()
-                     , redScore: TeamScore = TeamScore()
+                     , blueTeam: Team = Team(TeamColor.Blue)
+                     , redTeam: Team = Team(TeamColor.Red)
                      , blueScore: TeamScore = TeamScore()
-                     , moveOrder: MoveOrder = MoveOrder.RedSpymasterMove) {
+                     , redScore: TeamScore = TeamScore()
+                     , moveOrder: MoveOrder = MoveOrder.Empty) {
 
-  def connectPlayer(player: Player): Game = this.copy(players = player +: this.players)
+  /*def connectPlayer(player: Player): Game = this.copy(players = player +: this.players)
   def disconnectPlayer(player: Player): Game = this.copy(players = this.players.filterNot(_.equals(player)))
   def disconnectPlayerByID(playerID: ID): Game = this.copy(players = this.players.filterNot(_.id.equals(playerID)))
-  def setWordCount(count: Int): Game = this.copy(wordsCount = GameWordsCount(count))
+  def setWordCount(count: Int): Game = this.copy(wordsCount = GameWordsCount(count))*/
 }
 
 object Game {
   final case class TeamScore(score: Int = 0) extends AnyVal
-  final case class GameWordsCount(count: Int = 0) extends AnyVal
+  object TeamScore {
+    implicit val teamScoreEncoder: Encoder[TeamScore] = Encoder.instance(_.score.asJson)
+    implicit val teamScoreDecoder: Decoder[TeamScore] = Decoder[Int].map(TeamScore(_))
+  }
 
-  def createGame[F[_]: Sync](creator: Player): F[Game] = {
-    ID()
-      .map { gameId =>
-        Game(id = gameId, gameCreator = creator, players = Vector(creator))
-      }
+  final case class GameWordsCount(count: Int = 0) extends AnyVal
+  object GameWordsCount {
+    implicit val gameWordsCountEncoder: Encoder[GameWordsCount] = Encoder.instance(_.count.asJson)
+    implicit val gameWordsCountDecoder: Decoder[GameWordsCount] = Decoder[Int].map(GameWordsCount(_))
+  }
+
+  implicit val gameEncoder: Encoder[Game] =
+    Encoder
+      .forProduct10("id", "gameCreator", "gameState", "cards", "wordsCount", "blueTeam", "redTeam", "blueScore", "redScore", "moveOrder")(s => (s.id, s.gameCreator, s.gameState, s.cards, s.wordsCount, s.blueTeam, s.redTeam, s.blueScore, s.redScore, s.moveOrder))
+  implicit val gameDecoder: Decoder[Game] =
+    Decoder
+      .forProduct10("id", "gameCreator", "gameState", "cards", "wordsCount", "blueTeam", "redTeam", "blueScore", "redScore", "moveOrder")(Game.apply)
+
+  def apply(creator: Player): Game = {
+    Game(id = GameId(), gameCreator = creator)
   }
 }
