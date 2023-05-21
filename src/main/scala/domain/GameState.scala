@@ -1,27 +1,22 @@
 package domain
 
+import cats.implicits._
 import enumeratum.{Enum, EnumEntry}
-import io.circe.{Decoder, Encoder}
+import io.circe._
 
-sealed trait GameState extends EnumEntry
+import scala.util.Try
+
+sealed trait GameState extends EnumEntry with Product
 
 object GameState extends Enum[GameState] {
   val values: IndexedSeq[GameState] = findValues
 
-  implicit val gameStateEncode: Encoder[GameState] = Encoder[String].contramap {
-    case WaitingPayers => "waitingPayers"
-    case InProgress => "inProgress"
-    case Finished => "finished"
-  }
+  implicit val gameStateEncode: Encoder[GameState] = Encoder[String].contramap(_.productPrefix)
 
   implicit val gameStateDecode: Decoder[GameState] =
     Decoder
       .decodeString
-      .emap {
-        case "waitingPayers" => Right(WaitingPayers)
-        case "inProgress" => Right(InProgress)
-        case "finished" => Right(Finished)
-      }
+      .emap(str => Try(GameState.withName(str)).toEither.leftMap(_.getMessage))
 
   case object WaitingPayers extends GameState
 

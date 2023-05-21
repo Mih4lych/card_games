@@ -37,6 +37,22 @@ object ID extends Enum[ID] {
     def apply(): PlayerId = nextId(PlayerId(_))
   }
 
+  case class TeamId(id: String) extends ID
+  object TeamId {
+    implicit val teamIdIdEncoder: Encoder[TeamId] = Encoder.instance(_.id.asJson)
+    implicit val teamIdIdDecoder: Decoder[TeamId] = Decoder[String].map(TeamId(_))
+
+    def apply(): TeamId = nextId(TeamId(_))
+  }
+
+  case class ResultId(id: String) extends ID
+  object ResultId {
+    implicit val teamIdIdEncoder: Encoder[ResultId] = Encoder.instance(_.id.asJson)
+    implicit val teamIdIdDecoder: Decoder[ResultId] = Decoder[String].map(ResultId(_))
+
+    def apply(): ResultId = nextId(ResultId(_))
+  }
+
   private def nextId[A <: ID](f: String => A): A =
     f(UUID.randomUUID().toString)
 }

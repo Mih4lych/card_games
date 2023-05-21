@@ -11,9 +11,9 @@ trait CardProcess[F[_]] {
 }
 
 object CardProcess {
-  def apply[F[_]: Sync: Random]: CardProcess[F] =
+  def apply[F[_] : Sync : Random]: CardProcess[F] =
     new CardProcess[F] {
-      override def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]] = {
+      /*override def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]] = {
         for {
           shuffledCardRoles <- _shuffleRoles(wordsCount, startingTeam)
           cards <- Sync[F].delay(words.zip(shuffledCardRoles).map(Function.tupled(Card.apply)))
@@ -37,5 +37,8 @@ object CardProcess {
           }
         }
       }
+    }*/
+
+      override def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]] = ???
     }
 }

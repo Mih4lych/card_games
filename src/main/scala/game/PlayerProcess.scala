@@ -1,13 +1,18 @@
 package game
 
-import domain.{Player, PlayerRole}
+import cats.effect.{Async, Ref}
+import domain.ID.{CardId, TeamId}
+import domain.{Game, Player, PlayerRole}
+import util.ErrorOrT
 
-trait PlayerProcess {
-  def changeRole(player: Player, playerRole: PlayerRole): Player
+trait PlayerProcess[F[_]] {
+  def playCard(gameRef: Ref[F, Game], cardId: CardId): ErrorOrT[F, Unit]
 }
 object PlayerProcess {
-  def apply: PlayerProcess =
-    new PlayerProcess {
-      override def changeRole(player: Player, playerRole: PlayerRole): Player = player.copy(role = playerRole)
+  def apply[F[_]: Async]: PlayerProcess[F] =
+    new PlayerProcess[F] {
+      override def playCard(gameRef: Ref[F, Game], cardId: CardId): ErrorOrT[F, Unit] = ???
+
+      def changeTeam(player: Player, teamId: TeamId) = ???
     }
 }

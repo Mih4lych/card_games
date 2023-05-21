@@ -11,5 +11,10 @@ package object util {
       case Some(value) => value +: restSeq
       case None        => restSeq
     }
+
+    /*seq.map {
+      case a if pred(a) => updater(a)
+      case a            => a
+    }*/
   }
 }

@@ -1,26 +1,24 @@
 package domain
 
+import cats.implicits._
 import enumeratum.{Enum, EnumEntry}
 import io.circe._
-sealed trait CardState extends EnumEntry
+
+import scala.util.Try
+
+sealed trait CardState extends EnumEntry with Product
 
 object CardState extends Enum[CardState] {
   val values: IndexedSeq[CardState] = findValues
 
-  implicit val cardStateEncode: Encoder[CardState] = Encoder[String].contramap {
-    case Closed => "closed"
-    case Opened => "opened"
-  }
+  implicit val cardStateEncode: Encoder[CardState] = Encoder[String].contramap(_.entryName)
 
   implicit val cardStateDecode: Decoder[CardState] =
     Decoder
       .decodeString
-      .emap {
-        case "closed" => Right(Closed)
-        case "opened" => Right(Opened)
-      }
+      .emap(str => Try(CardState.withName(str)).toEither.leftMap(_.getMessage))
 
-  case object Closed extends CardState
+  case object Hidden extends CardState
 
-  case object Opened extends CardState
+  case object Revealed extends CardState
 }

@@ -10,12 +10,13 @@ trait TeamProcess {
   def addPlayer(team: Team, player: Player): Either[GameError, Team]
   def changeRole(team: Team, playerId: PlayerId, role: PlayerRole): Either[GameError, Team]
   def removePlayer(team: Team, playerId: PlayerId): Team
+  def validateTeam(team: Team): Either[GameError, Unit]
 }
 
 object TeamProcess {
   def apply(): TeamProcess =
     new TeamProcess {
-      override def addPlayer(team: Team, player: Player): Either[GameError, Team] = {
+      /*override def addPlayer(team: Team, player: Player): Either[GameError, Team] = {
         for {
           _ <- _validateRoleChange(team, player.id, PlayerRole.Operative)
           team <- team.copy(players = player +: team.players).asRight[GameError]
@@ -54,10 +55,19 @@ object TeamProcess {
         }
       }
 
-      def validateTeam(team: Team): Either[GameError, Unit] = {
+      override def validateTeam(team: Team): Either[GameError, Unit] = {
         if (!team.hasSpymaster) TeamWithoutSpymasterError.asLeft
         else if (team.players.forall(_.role.equals(PlayerRole.Spymaster))) TeamWithoutOperativeError.asLeft
         else ().asRight
       }
+    }*/
+
+      override def addPlayer(team: Team, player: Player): Either[GameError, Team] = ???
+
+      override def changeRole(team: Team, playerId: PlayerId, role: PlayerRole): Either[GameError, Team] = ???
+
+      override def removePlayer(team: Team, playerId: PlayerId): Team = ???
+
+      override def validateTeam(team: Team): Either[GameError, Unit] = ???
     }
 }
