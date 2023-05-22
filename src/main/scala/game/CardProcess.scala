@@ -1,19 +1,26 @@
 package game
 
+import cats.data.EitherT
 import cats.syntax.all._
 import cats.effect._
 import cats.effect.std.Random
 import domain._
 import domain.Game._
+import domain.GameError._
+import domain.ID.CardId
+import game.Round.Event
+import service.db.CardTableService
+import util.ErrorOrT
 
 trait CardProcess[F[_]] {
-  def makeCards(gameRef: Ref[F, Game], words: Vector[String]): F[Vector[Card]]
+  def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit]
+  def playCard(cardId: CardId): ErrorOrT[F, Unit]
 }
 
 object CardProcess {
-  def apply[F[_] : Sync : Random]: CardProcess[F] =
+  def apply[F[_]: Async: Random](cardTableService: CardTableService[F]): CardProcess[F] =
     new CardProcess[F] {
-      override def makeCards(gameRef: Ref[F, Game], words: Vector[String]): F[Vector[Card]] = {
+      override def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit] = {
         for {
           game              <- gameRef.get
           shuffledCardRoles <- _shuffleRoles(game.wordsCount, TeamColor.Red)
@@ -22,25 +29,33 @@ object CardProcess {
               .delay(words.zip(shuffledCardRoles).map {
                 case (word, role) => Card(game.id, word, role)
               })
-        } yield cards
+          _                 <- cardTableService.insertCards(cards)
+        } yield ()
       }
 
-      private def _shuffleRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[CardRole]] = {
-        Random[F].shuffleVector(_fillRoles(wordsCount, startingTeam))
+      private def _shuffleRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): F[List[CardRole]] = {
+        Random[F].shuffleList(_fillRoles(wordsCount, startingTeam))
       }
 
-      private def _fillRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): Vector[CardRole] = {
+      private def _fillRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): List[CardRole] = {
         val countPerRole = (wordsCount.count - 1) / 3
 
-        Vector.fill(countPerRole)(CardRole.Agent(TeamColor.Red)) ++
-          Vector.fill(countPerRole)(CardRole.Agent(TeamColor.Blue)) ++
-          Vector.fill(countPerRole)(CardRole.Innocent) ++
-          Vector(CardRole.Assassin) ++ {
+        List.fill(countPerRole)(CardRole.Agent(TeamColor.Red)) ++
+          List.fill(countPerRole)(CardRole.Agent(TeamColor.Blue)) ++
+          List.fill(countPerRole)(CardRole.Innocent) ++
+          List(CardRole.Assassin) ++ {
           startingTeam match {
-            case TeamColor.Blue => Vector(CardRole.Agent(TeamColor.Red))
-            case TeamColor.Red => Vector(CardRole.Agent(TeamColor.Blue))
+            case TeamColor.Blue => List(CardRole.Agent(TeamColor.Red))
+            case TeamColor.Red  => List(CardRole.Agent(TeamColor.Blue))
           }
         }
+      }
+
+      override def playCard(cardId: CardId): ErrorOrT[F, Unit] = {
+        for {
+          card <- EitherT.fromOptionF(cardTableService.getCardById(cardId), CardNotFoundError)
+          _    <- EitherT.liftF(cardTableService.updateCard(cardId, card.revealCard))
+        } yield ()
       }
     }
 }

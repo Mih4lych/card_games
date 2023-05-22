@@ -15,6 +15,7 @@ val newTypeVersion = "0.4.4"
 val http4sVersion = "0.23.18"
 val scalaTestVersion = "3.2.9"
 val circeVersion = "0.14.5"
+val slickEffectVersion = "0.4.0"
 
 libraryDependencies ++= Seq(
   "com.beachape" %% "enumeratum" % enumeratumVersion
@@ -55,7 +56,10 @@ libraryDependencies ++= Seq(
   "com.github.tminglei" %% "slick-pg_play-json" % "0.20.3"
 )
 
+libraryDependencies ++= Seq(
+  "com.kubukoz" %% "slick-effect" % slickEffectVersion,
+  "com.kubukoz" %% "slick-effect-catsio" % slickEffectVersion,
+  "com.kubukoz" %% "slick-effect-transactor" % slickEffectVersion
+)
+
 addCompilerPlugin("org.typelevel" % "kind-projector" % "0.13.2" cross CrossVersion.full)
-enablePlugins(SbtLiquibaseSlickCodegen)
-liquibaseSlickCodegenOutputPackage := "service.db"
-liquibaseSlickCodegenOutputClass := "Tables"
