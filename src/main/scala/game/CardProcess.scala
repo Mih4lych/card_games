@@ -1,30 +1,35 @@
 package game
 
 import cats.syntax.all._
-import cats.effect.Sync
+import cats.effect._
 import cats.effect.std.Random
-import domain.Game.GameWordsCount
-import domain.{Card, CardRole, TeamColor}
+import domain._
+import domain.Game._
 
 trait CardProcess[F[_]] {
-  def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]]
+  def makeCards(gameRef: Ref[F, Game], words: Vector[String]): F[Vector[Card]]
 }
 
 object CardProcess {
   def apply[F[_] : Sync : Random]: CardProcess[F] =
     new CardProcess[F] {
-      /*override def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]] = {
+      override def makeCards(gameRef: Ref[F, Game], words: Vector[String]): F[Vector[Card]] = {
         for {
-          shuffledCardRoles <- _shuffleRoles(wordsCount, startingTeam)
-          cards <- Sync[F].delay(words.zip(shuffledCardRoles).map(Function.tupled(Card.apply)))
+          game              <- gameRef.get
+          shuffledCardRoles <- _shuffleRoles(game.wordsCount, TeamColor.Red)
+          cards             <-
+            Sync[F]
+              .delay(words.zip(shuffledCardRoles).map {
+                case (word, role) => Card(game.id, word, role)
+              })
         } yield cards
       }
 
       private def _shuffleRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[CardRole]] = {
-        Random[F].shuffleVector(_fillRolesVector(wordsCount, startingTeam))
+        Random[F].shuffleVector(_fillRoles(wordsCount, startingTeam))
       }
 
-      private def _fillRolesVector(wordsCount: GameWordsCount, startingTeam: TeamColor): Vector[CardRole] = {
+      private def _fillRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): Vector[CardRole] = {
         val countPerRole = (wordsCount.count - 1) / 3
 
         Vector.fill(countPerRole)(CardRole.Agent(TeamColor.Red)) ++
@@ -37,8 +42,5 @@ object CardProcess {
           }
         }
       }
-    }*/
-
-      override def makeCards(words: Vector[String], wordsCount: GameWordsCount, startingTeam: TeamColor): F[Vector[Card]] = ???
     }
 }

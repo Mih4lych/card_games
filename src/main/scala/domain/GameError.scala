@@ -9,10 +9,10 @@ object GameError extends Enum[GameError] {
 
   case object WordServiceConnectionError extends GameError
   case object WordParseError extends GameError
-  case object SpymasterExistenceError extends GameError
+  case object SpymasterAlreadyExistsError extends GameError
   case object CardAlreadyOpenedError extends GameError
   case object PlayerAlreadyInTeamError extends GameError
   case object SpymasterAlreadyInTeamError extends GameError
-  case object TeamWithoutOperativeError extends GameError
+  case object TeamWithoutOperativesError extends GameError
   case object TeamWithoutSpymasterError extends GameError
 }

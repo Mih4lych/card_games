@@ -1,5 +1,6 @@
 package domain
 
+import cats.kernel.Semigroup
 import domain.ID._
 import io.circe._
 import io.circe.generic.semiauto._
