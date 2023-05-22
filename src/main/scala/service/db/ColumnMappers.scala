@@ -7,8 +7,6 @@ import domain.MoveOrder._
 import slick.jdbc.PostgresProfile.api._
 
 object ColumnMappers {
-
-
   implicit val cardIdColumnType = MappedColumnType.base[CardId, String](
     _.id, string => CardId(string))
   implicit val cardStateColumnType = MappedColumnType.base[CardState, String](
