@@ -8,7 +8,7 @@ import slick.jdbc.PostgresProfile.api._
 class ResultTable(tag: Tag) extends Table[Result](tag, "Result") {
   def id = column[ResultId]("id", O.PrimaryKey)
 
-  def gameId = column[GameId]("gameCreator")
+  def gameId = column[GameId]("gameId")
 
   def winningTeam = column[TeamId]("winningTeam")
 

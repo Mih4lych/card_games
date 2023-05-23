@@ -14,7 +14,7 @@ import util.ErrorOrT
 
 trait CardProcess[F[_]] {
   def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit]
-  def playCard(cardId: CardId): ErrorOrT[F, Unit]
+  def playCard(cardId: CardId): ErrorOrT[F, CardRole]
 }
 
 object CardProcess {
@@ -29,7 +29,7 @@ object CardProcess {
               .delay(words.zip(shuffledCardRoles).map {
                 case (word, role) => Card(game.id, word, role)
               })
-          _                 <- cardTableService.insertCards(cards)
+          _                 <- cardTableService.insert(cards)
         } yield ()
       }
 
@@ -51,11 +51,11 @@ object CardProcess {
         }
       }
 
-      override def playCard(cardId: CardId): ErrorOrT[F, Unit] = {
+      override def playCard(cardId: CardId): ErrorOrT[F, CardRole] = {
         for {
           card <- EitherT.fromOptionF(cardTableService.getCardById(cardId), CardNotFoundError)
-          _    <- EitherT.liftF(cardTableService.updateCard(cardId, card.revealCard))
-        } yield ()
+          _    <- EitherT.liftF(cardTableService.update(cardId, card.revealCard))
+        } yield card.cardRole
       }
     }
 }

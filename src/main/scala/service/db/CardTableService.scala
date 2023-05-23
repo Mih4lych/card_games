@@ -10,8 +10,8 @@ import slickeffect.Transactor
 trait CardTableService[F[_]] {
   def getAllCardByGameId(gameId: GameId): F[Seq[Card]]
   def getCardById(id: CardId): F[Option[Card]]
-  def insertCards(cards: Seq[Card]): F[Unit]
-  def updateCard(id: CardId, card: Card): F[Unit]
+  def insert(cards: Seq[Card]): F[Unit]
+  def update(id: CardId, card: Card): F[Unit]
 }
 object CardTableService {
   def apply[F[_]: Async](transactor: Resource[F, Transactor[F]]): CardTableService[F] =
@@ -20,8 +20,8 @@ object CardTableService {
 
       override def getCardById(id: CardId): F[Option[Card]] = transactor.use(_.transact(CardTable.byId(id).result.headOption))
 
-      override def insertCards(cards: Seq[Card]): F[Unit] = transactor.use(_.transact(CardTable.table ++= cards)).void
+      override def insert(cards: Seq[Card]): F[Unit] = transactor.use(_.transact(CardTable.table ++= cards)).void
 
-      override def updateCard(id: CardId, card: Card): F[Unit] = transactor.use(_.transact(CardTable.byId(id).update(card))).void
+      override def update(id: CardId, card: Card): F[Unit] = transactor.use(_.transact(CardTable.byId(id).update(card))).void
     }
 }
