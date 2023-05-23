@@ -18,7 +18,6 @@ class TeamTable(tag: Tag) extends Table[Team](tag, "Team") {
 }
 
 object TeamTable extends TableQuery(new TeamTable(_)) {
-  lazy val table = TableQuery[TeamTable]
   lazy val byId = Compiled((id: Rep[TeamId]) => filter(_.id === id))
   lazy val byGameId = Compiled((id: Rep[GameId]) => filter(_.gameId === id))
 }

@@ -1,11 +1,14 @@
 package domain
 
+import cats.data.EitherT
 import enumeratum.{Enum, EnumEntry}
 
 sealed trait GameError extends EnumEntry
 
 object GameError extends Enum[GameError] {
   override val values: IndexedSeq[GameError] = findValues
+
+  type ErrorOrT[F[_], A] = EitherT[F, GameError, A]
 
   case object WordServiceConnectionError extends GameError
   case object WordParseError extends GameError
@@ -15,5 +18,10 @@ object GameError extends Enum[GameError] {
   case object SpymasterAlreadyInTeamError extends GameError
   case object TeamWithoutOperativesError extends GameError
   case object TeamWithoutSpymasterError extends GameError
+
   case object CardNotFoundError extends GameError
+  case object PlayerNotFoundError extends GameError
+  case object TeamNotFoundError extends GameError
+  case object ResultNotFoundError extends GameError
+  case object GameNotFoundError extends GameError
 }

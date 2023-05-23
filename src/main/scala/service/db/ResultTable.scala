@@ -8,7 +8,7 @@ import slick.jdbc.PostgresProfile.api._
 class ResultTable(tag: Tag) extends Table[Result](tag, "Result") {
   def id = column[ResultId]("id", O.PrimaryKey)
 
-  def gameId = column[GameId]("gameCreator")
+  def gameId = column[GameId]("gameId")
 
   def winningTeam = column[TeamId]("winningTeam")
 
@@ -20,7 +20,6 @@ class ResultTable(tag: Tag) extends Table[Result](tag, "Result") {
 }
 
 object ResultTable extends TableQuery(new ResultTable(_)) {
-  lazy val table = TableQuery[ResultTable]
   lazy val byId = Compiled((id: Rep[ResultId]) => filter(_.id === id))
   lazy val byGameId = Compiled((id: Rep[GameId]) => filter(_.gameId === id))
   lazy val byTeamId = Compiled((id: Rep[TeamId]) => filter(_.winningTeam === id))

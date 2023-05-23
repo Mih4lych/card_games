@@ -20,7 +20,6 @@ class CardTable(tag: Tag) extends Table[Card](tag, "Card") {
 }
 
 object CardTable extends TableQuery(new CardTable(_)) {
-  lazy val table = TableQuery[CardTable]
   lazy val byId = Compiled((id: Rep[CardId]) => filter(_.id === id))
   lazy val byGameId = Compiled((id: Rep[GameId]) => filter(_.gameId === id))
 }
