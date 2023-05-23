@@ -1,4 +1,5 @@
 create table if not exists "Card" ("id" VARCHAR NOT NULL PRIMARY KEY,"gameId" VARCHAR NOT NULL,"word" VARCHAR NOT NULL,"cardRole" VARCHAR NOT NULL,"cardState" VARCHAR NOT NULL);
 create table if not exists "Player" ("id" VARCHAR NOT NULL PRIMARY KEY,"name" VARCHAR NOT NULL,"gameId" VARCHAR NOT NULL,"teamId" VARCHAR NOT NULL,"role" VARCHAR NOT NULL);
 create table if not exists "Result" ("id" VARCHAR NOT NULL PRIMARY KEY,"gameId" VARCHAR NOT NULL,"winningTeam" VARCHAR NOT NULL,"blueTeamScore" INTEGER NOT NULL,"redTeamScore" INTEGER NOT NULL);
-create table if not exists "Team" ("id" VARCHAR NOT NULL PRIMARY KEY,"gameId" VARCHAR NOT NULL,"teamColor" VARCHAR NOT NULL,"teamScore" INTEGER NOT NULL)
+create table if not exists "Team" ("id" VARCHAR NOT NULL PRIMARY KEY,"gameId" VARCHAR NOT NULL,"teamColor" VARCHAR NOT NULL,"teamScore" INTEGER NOT NULL);
+create table if not exists "game"."Game" ("id" VARCHAR NOT NULL PRIMARY KEY,"gameCreator" VARCHAR NOT NULL,"gameState" VARCHAR NOT NULL,"wordsCount" INTEGER NOT NULL,"moveOrder" VARCHAR NOT NULL)

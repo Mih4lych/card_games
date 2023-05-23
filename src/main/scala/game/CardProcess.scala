@@ -10,11 +10,10 @@ import domain.GameError._
 import domain.ID.CardId
 import game.Round.Event
 import service.db.CardTableService
-import util.ErrorOrT
 
 trait CardProcess[F[_]] {
   def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit]
-  def playCard(cardId: CardId): ErrorOrT[F, CardRole]
+  def playCard(cardId: CardId): ErrorOrT[F, Unit]
 }
 
 object CardProcess {
@@ -51,11 +50,11 @@ object CardProcess {
         }
       }
 
-      override def playCard(cardId: CardId): ErrorOrT[F, CardRole] = {
+      override def playCard(cardId: CardId): ErrorOrT[F, Unit] = {
         for {
           card <- EitherT.fromOptionF(cardTableService.getCardById(cardId), CardNotFoundError)
-          _    <- EitherT.liftF(cardTableService.update(cardId, card.revealCard))
-        } yield card.cardRole
+          _    <- EitherT.liftF(cardTableService.update(card.revealCard))
+        } yield ()
       }
     }
 }
