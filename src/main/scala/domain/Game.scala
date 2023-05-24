@@ -9,10 +9,11 @@ import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.syntax._
 
 final case class Game(id: GameId
-                     , gameCreator: PlayerId
-                     , gameState: GameState = GameState.WaitingPayers
-                     , wordsCount: GameWordsCount = GameWordsCount()
-                     , moveOrder: MoveOrder = MoveOrder.OperativesMove(TeamColor.Red))
+                      , gameState: GameState = GameState.WaitingPayers
+                      , wordsCount: GameWordsCount = GameWordsCount()
+                      , turn: Turn = Turn.OperativesTurn(TeamColor.Red)) {
+  def getMaxScore: Score = Score((wordsCount.count - 1) / 3)
+}
 
 object Game {
 
@@ -25,7 +26,7 @@ object Game {
   implicit val gameEncoder: Encoder[Game] = deriveEncoder[Game]
   implicit val gameDecoder: Decoder[Game] = deriveDecoder[Game]
 
-  def apply(creator: PlayerId): Game = {
-    Game(id = GameId(), gameCreator = creator)
+  def apply(): Game = {
+    Game(id = GameId())
   }
 }

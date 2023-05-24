@@ -36,6 +36,7 @@
     <orderEntry type="library" name="sbt: com.typesafe.slick:slick_2.13:3.3.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.typesafe:config:1.3.2:jar" level="project" />
     <orderEntry type="library" name="sbt: com.zaxxer:HikariCP:4.0.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.chrisdavenport:mules_2.13:0.7.0:jar" level="project" />
     <orderEntry type="library" name="sbt: io.circe:circe-core_2.13:0.14.5:jar" level="project" />
     <orderEntry type="library" name="sbt: io.circe:circe-generic_2.13:0.14.5:jar" level="project" />
     <orderEntry type="library" name="sbt: io.circe:circe-jawn_2.13:0.14.5:jar" level="project" />

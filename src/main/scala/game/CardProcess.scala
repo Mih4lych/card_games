@@ -1,28 +1,29 @@
 package game
 
 import cats.data.EitherT
-import cats.syntax.all._
 import cats.effect._
 import cats.effect.std.Random
+import cats.syntax.all._
 import domain._
 import domain.Game._
 import domain.GameError._
-import domain.ID.CardId
-import game.Round.Event
-import service.db.CardTableService
+import domain.ID._
+import service.CardClient
+import service.db.CardTableDbService
 
 trait CardProcess[F[_]] {
-  def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit]
-  def playCard(cardId: CardId): ErrorOrT[F, Unit]
+  def makeCards(game: Game): F[Unit]
+  def revealCard(cardId: Card): F[Unit]
+  def getCardById(cardId: CardId): ErrorOrT[F, Card]
 }
 
 object CardProcess {
-  def apply[F[_]: Async: Random](cardTableService: CardTableService[F]): CardProcess[F] =
+  def apply[F[_]: Async: Random](cardTableService: CardTableDbService[F], cardClient: CardClient[F]): CardProcess[F] =
     new CardProcess[F] {
-      override def makeCards(gameRef: Ref[F, Game], words: List[String]): F[Unit] = {
+      override def makeCards(game: Game): F[Unit] = {
         for {
-          game              <- gameRef.get
-          shuffledCardRoles <- _shuffleRoles(game.wordsCount, TeamColor.Red)
+          words             <- cardClient.getWords(game.wordsCount)
+          shuffledCardRoles <- _shuffleRoles(game.getMaxScore.score, TeamColor.Red)
           cards             <-
             Sync[F]
               .delay(words.zip(shuffledCardRoles).map {
@@ -32,16 +33,14 @@ object CardProcess {
         } yield ()
       }
 
-      private def _shuffleRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): F[List[CardRole]] = {
-        Random[F].shuffleList(_fillRoles(wordsCount, startingTeam))
+      private def _shuffleRoles(cardCountPerRole: Int, startingTeam: TeamColor): F[List[CardRole]] = {
+        Random[F].shuffleList(_fillRoles(cardCountPerRole, startingTeam))
       }
 
-      private def _fillRoles(wordsCount: GameWordsCount, startingTeam: TeamColor): List[CardRole] = {
-        val countPerRole = (wordsCount.count - 1) / 3
-
-        List.fill(countPerRole)(CardRole.Agent(TeamColor.Red)) ++
-          List.fill(countPerRole)(CardRole.Agent(TeamColor.Blue)) ++
-          List.fill(countPerRole)(CardRole.Innocent) ++
+      private def _fillRoles(cardCountPerRole: Int, startingTeam: TeamColor): List[CardRole] = {
+        List.fill(cardCountPerRole)(CardRole.Agent(TeamColor.Red)) ++
+          List.fill(cardCountPerRole)(CardRole.Agent(TeamColor.Blue)) ++
+          List.fill(cardCountPerRole)(CardRole.Innocent) ++
           List(CardRole.Assassin) ++ {
           startingTeam match {
             case TeamColor.Blue => List(CardRole.Agent(TeamColor.Red))
@@ -50,11 +49,8 @@ object CardProcess {
         }
       }
 
-      override def playCard(cardId: CardId): ErrorOrT[F, Unit] = {
-        for {
-          card <- EitherT.fromOptionF(cardTableService.getCardById(cardId), CardNotFoundError)
-          _    <- EitherT.liftF(cardTableService.update(card.revealCard))
-        } yield ()
-      }
+      override def revealCard(card: Card): F[Unit] = cardTableService.update(card.revealCard)
+
+      override def getCardById(cardId: CardId): ErrorOrT[F, Card] = EitherT.fromOptionF(cardTableService.getCardById(cardId), NotFoundError("Card"))
     }
 }
