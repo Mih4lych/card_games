@@ -18,10 +18,7 @@ object GameError extends Enum[GameError] {
   case object SpymasterAlreadyInTeamError extends GameError
   case object TeamWithoutOperativesError extends GameError
   case object TeamWithoutSpymasterError extends GameError
+  case object CannotChangeTurnError extends GameError
 
-  case object CardNotFoundError extends GameError
-  case object PlayerNotFoundError extends GameError
-  case object TeamNotFoundError extends GameError
-  case object ResultNotFoundError extends GameError
-  case object GameNotFoundError extends GameError
+  case class NotFoundError(entity: String) extends GameError
 }

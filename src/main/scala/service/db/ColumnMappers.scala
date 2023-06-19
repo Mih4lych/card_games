@@ -3,7 +3,7 @@ import domain._
 import domain.CardRole._
 import domain.Game._
 import domain.ID._
-import domain.MoveOrder._
+import domain.Turn._
 import slick.jdbc.PostgresProfile.api._
 
 object ColumnMappers {
@@ -37,12 +37,12 @@ object ColumnMappers {
     _.entryName, string => GameState.withName(string))
   implicit val wordsCountColumnType = MappedColumnType.base[GameWordsCount, Int](
     _.count, int => GameWordsCount(int))
-  implicit val moveOrderColumnType = MappedColumnType.base[MoveOrder, String](
+  implicit val moveOrderColumnType = MappedColumnType.base[Turn, String](
     _.entryName, {
-      case "RedSpymasterMove" => SpymasterMove(TeamColor.Red)
-      case "BlueSpymasterMove" => SpymasterMove(TeamColor.Blue)
-      case "RedOperativesMove" => OperativesMove(TeamColor.Red)
-      case "BlueOperativesMove" => OperativesMove(TeamColor.Blue)
+      case "RedSpymasterMove" => SpymasterTurn(TeamColor.Red)
+      case "BlueSpymasterMove" => SpymasterTurn(TeamColor.Blue)
+      case "RedOperativesMove" => OperativesTurn(TeamColor.Red)
+      case "BlueOperativesMove" => OperativesTurn(TeamColor.Blue)
     })
 
   implicit val resultIdColumnType = MappedColumnType.base[ResultId, String](
